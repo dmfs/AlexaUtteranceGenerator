@@ -31,9 +31,13 @@ def parseFile(f):
       if not "slots" in intents[currentIntent]:
         intents[currentIntent]['slots'] = {}
       intents[currentIntent]['slots'].update(slots)
-      
+  
+    seen = []
+    # note, we could just iterate over set(utterances) but that wmight change the order of elements.
     for u in utterances:
-      print (u)
+      if u not in seen:
+        print (u)
+        seen.append(u)
 
   print ("--------------- snip ----------------")
   print (json.dumps({"intents": [{"intent": name, "slots": [{"name": n, "type": t} for n, t in value.get("slots", {}).items()]} for name, value in intents.items()]}, indent=2, sort_keys=True))
@@ -49,19 +53,17 @@ def expandUtterance(utterance):
 
 
 def expandOptionals(utterance):
-  if "[" in utterance:
-    return [re.sub("\[([^\[\]]+)\]","\g<1>", utterance), re.sub("\[([^\[\]]+)\]","", utterance)]
+  if '[' in utterance:
+    return expandOptionals(re.sub("\[([^\[\]]+)\]","\g<1>", utterance,1)) + expandOptionals(re.sub("\[([^\[\]]+)\]","", utterance,1))
   return [utterance]
 
 def expandAlternatives(utterance):
-  if "(" in utterance:
-    m = re.search(r'\(([^\(\)]+)\)', utterance)
-    if not m:
-      return [utterance]
-    match = m.group(0)
-    words = m.group(1).split("|")
-    return [a for w in words for a in expandAlternatives(utterance.replace(match, w))]
-  return [utterance]
+  m = re.search(r'\(([^\(\)]+)\)', utterance)
+  if not m:
+    return [utterance]
+  match = m.group(0)
+  words = m.group(1).split("|")
+  return [a for w in words for a in expandAlternatives(utterance.replace(match, w))]
 
 
 def collectSlots(utterance):
