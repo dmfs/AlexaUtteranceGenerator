@@ -16,7 +16,7 @@ Compact utterances support the following elements:
 
 * alternative: `(a|b)`
 
-  Expands to two utterances. One containing `a` the other one containing `b`. The brackets can contain any numer of alternatives separated by `|`. Be aware that multiple alternatives in a compact utterance will result in the product of the numbers of alternatives utterances.
+  Expands to two or more utterances, one for each option. The brackets can contain any numer of alternatives separated by `|`. Be aware that multiple alternatives in a compact utterance will result in the product of the numbers of alternatives utterances.
 
 * optional: `[a]`
 
